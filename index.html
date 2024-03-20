@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="index.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Recommender System</title>
+</head>
+
+<body>
+  <div class="bodyy">
+  <h1>Hotel Recommender System</h1>
+  <form id="hotelForm">
+    <label for="budget">Budget per day:</label>
+    <input type="number" id="budget" name="budget">
+    <br>
+    <label for="rating">Rating:</label>
+    <input type="number" id="rating" name="rating">
+    <br>
+    <button type="button" onclick="submitForm()">Submit</button>
+  </form>
+
+  <div id="results">
+    <h2>Recommended Hotels</h2>
+    <p id="predictedRating"></p>
+    <ul id="recommendedHotels"></ul>
+  </div>
+</div>
+
+  <script>
+    async function submitForm() {
+      const budget = parseFloat(document.querySelector('#budget').value);
+      const rating = parseFloat(document.querySelector('#rating').value);
+
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ budget, rating }),
+      });
+
+      const result = await response.json();
+
+      document.getElementById('predictedRating').textContent = `Predicted Rating: ${result.predicted_rating}`;
+
+      const recommendedHotelsList = document.getElementById('recommendedHotels');
+      recommendedHotelsList.innerHTML = '';
+
+      if (result.recommended_hotels.length > 0) {
+        result.recommended_hotels.forEach((hotel) => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `Hotel Name: ${hotel.hotel_name}, Rating: ${hotel.Rating}`;
+          recommendedHotelsList.appendChild(listItem);
+        });
+      } else {
+        const noResultsItem = document.createElement('li');
+        noResultsItem.textContent = 'No hotels match your criteria.';
+        recommendedHotelsList.appendChild(noResultsItem);
+      }
+    }
+  </script>
+</body>
+
+</html>
